@@ -1,0 +1,73 @@
+version: '2'
+
+services:
+  free5gc-upf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: free5gc-upf
+    command: |
+      /bin/bash -c "
+        cd /gofree5gc/src/upf && mkdir -p build && cd build && cmake .. && make -j8
+        ./bin/free5gc-upfd -f ./config/upfcfg.docker.yaml &
+        sleep 1
+        ip r add 60.60.0.0/24 dev free5GCgtp0
+        sleep infinity
+      "
+    privileged: true
+    volumes:
+      - "./gofree5gc:/gofree5gc"
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+    networks:
+      privnet:
+        ipv4_address: 10.200.200.101
+      untrust:
+
+  free5gc-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: free5gc-core
+    command: |
+      /bin/bash -c "
+      cd /gofree5gc/src/test && go test -v -vet=off -run TestPaging
+      "
+    volumes:
+      - "./gofree5gc:/gofree5gc"
+    environment:
+      DB_URI: mongodb://db/free5gc
+    networks:
+      privnet:
+        ipv4_address: 10.200.200.1
+      untrust:
+    depends_on:
+      - free5gc-upf
+      - db
+
+  db:
+    image: mongo
+    container_name: mongodb
+    command: mongod
+    expose:
+      - "27018"
+    networks:
+      privnet:
+        ipv4_address: 10.200.200.2
+#    volumes:
+#      - ./mongodb:/data/db
+
+networks:
+  privnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.200.200.0/24
+          gateway: 10.200.200.254
+  untrust:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.5.0/24
