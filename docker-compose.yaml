@@ -8,10 +8,11 @@ services:
     container_name: free5gc-upf
     command: |
       /bin/bash -c "
-        cd /gofree5gc/src/upf && mkdir -p build && cd build && cmake .. && make -j8
+        cd /gofree5gc/src/upf && mkdir -p build && cd build && cmake .. && make -j8 && make install
         ./bin/free5gc-upfd -f ./config/upfcfg.docker.yaml &
         sleep 1
         ip r add 60.60.0.0/24 dev free5GCgtp0
+        ip addr add 60.60.0.100 dev lo
         sleep infinity
       "
     privileged: true
@@ -33,7 +34,7 @@ services:
     container_name: free5gc-core
     command: |
       /bin/bash -c "
-      cd /gofree5gc/src/test && go test -v -vet=off -run TestPaging
+      cd /gofree5gc/src/test && go test -v -vet=off -run TestRegistration
       "
     volumes:
       - "./gofree5gc:/gofree5gc"
@@ -50,7 +51,7 @@ services:
   db:
     image: mongo
     container_name: mongodb
-    command: mongod
+    command: mongod --port 27018
     expose:
       - "27018"
     networks:
