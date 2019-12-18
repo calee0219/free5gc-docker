@@ -8,7 +8,7 @@ services:
     container_name: free5gc-upf
     command: |
       /bin/bash -c "
-        cd /gofree5gc/src/upf && mkdir -p build && cd build && cmake .. && make -j8 && make install
+        cd /gofree5gc/src/upf && rm -rf ./build && mkdir -p build && cd build && cmake .. && make -j8 && make install
         ./bin/free5gc-upfd -f ./config/upfcfg.docker.yaml &
         sleep 1
         ip r add 60.60.0.0/24 dev free5GCgtp0
