@@ -1,0 +1,3 @@
+[submodule "gofree5gc"]
+	path = gofree5gc
+	url = git@bitbucket.org:free5gc-team/gofree5gc.git
