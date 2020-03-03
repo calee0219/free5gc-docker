@@ -1,4 +1,7 @@
 From golang:latest
+ENV GO111MODULE=on
+ENV GOPATH="/:${GOPATH}"
+WORKDIR /gofree5gc
 
 MAINTAINER Chia-An Lee <calee@cs.nctu.edu.tw>
 
