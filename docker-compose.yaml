@@ -58,6 +58,8 @@ services:
     command: mongod --port 27017
     expose:
       - "27017"
+    volumes:
+      - ./mongodb:/data/db
     networks:
       privnet:
         ipv4_address: 10.200.200.1
