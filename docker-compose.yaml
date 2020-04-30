@@ -1,19 +1,14 @@
 version: '2'
 
 services:
-  free5gc-upf:
+  free5gc-upf-1:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile/upf
       #container_name: upf
-    command: |
-      /bin/bash -c "
-        cd /gofree5gc/src/upf && rm -rf ./build && mkdir -p build && cd build && cmake .. && make -j8
-        ./bin/free5gc-upfd -f /config/upfcfg.yaml
-      "
+    command: ./free5gc-upfd -f /config/upfcfg1.yaml
     privileged: true
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     cap_add:
       - NET_ADMIN
@@ -22,6 +17,40 @@ services:
     networks:
       privnet:
         ipv4_address: 10.200.200.101
+
+  free5gc-upf-2:
+    build:
+      context: .
+      dockerfile: dockerfile/upf
+      #container_name: upf
+    command: ./free5gc-upfd -f /config/upfcfg2.yaml
+    privileged: true
+    volumes:
+      - "./config:/config"
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+    networks:
+      privnet:
+        ipv4_address: 10.200.200.103
+
+  free5gc-upf-b:
+    build:
+      context: .
+      dockerfile: dockerfile/upf
+      #container_name: upf
+    command: ./free5gc-upfd -f /config/upfcfgb.yaml
+    privileged: true
+    volumes:
+      - "./config:/config"
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+    networks:
+      privnet:
+        ipv4_address: 10.200.200.102
 
   db:
     image: mongo
@@ -38,14 +67,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nrf
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/nrf/nrf.go -nrfcfg /config/nrfcfg.conf
-      "
+    command: ./nrf -nrfcfg /config/nrfcfg.conf
     expose:
       - "29510"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     environment:
       DB_URI: mongodb://db/free5gc
@@ -60,14 +85,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: amf
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/amf/amf.go -amfcfg /config/amfcfg.conf
-      "
+    command: ./amf -amfcfg /config/amfcfg.conf
     expose:
       - "29518"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     networks:
       privnet:
@@ -80,14 +101,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: ausf
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/ausf/ausf.go -ausfcfg /config/ausfcfg.conf
-      "
+    command: ./ausf -ausfcfg /config/ausfcfg.conf
     expose:
       - "29509"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     networks:
       privnet:
@@ -100,14 +117,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nssf
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/nssf/nssf.go -nssfcfg /config/nssfcfg.conf
-      "
+    command: ./nssf -nssfcfg /config/nssfcfg.conf
     expose:
       - "29531"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     networks:
       privnet:
@@ -120,14 +133,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: pcf
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/pcf/pcf.go -pcfcfg /config/pcfcfg.conf
-      "
+    command: ./pcf -pcfcfg /config/pcfcfg.conf
     expose:
       - "29507"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     networks:
       privnet:
@@ -140,35 +149,29 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: smf
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/smf/smf.go -smfcfg /config/smf.cfg.conf -uerouting /config/uerouting.yaml
-      "
+    command: ./smf -smfcfg /config/smfcfg.conf -uerouting /config/uerouting.yaml
     expose:
       - "29502"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     networks:
       privnet:
         ipv4_address: 10.200.200.7
     depends_on:
       - free5gc-nrf
-      - free5gc-upf
+      - free5gc-upf-1
+      - free5gc-upf-2
+      - free5gc-upf-b
 
   free5gc-udm:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: udm
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/udm/udm.go -udmcfg /config/udmcfg.conf
-      "
+    command: ./udm -udmcfg /config/udmcfg.conf
     expose:
       - "29503"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     networks:
       privnet:
@@ -181,14 +184,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: udr
-    command: |
-      /bin/bash -c "
-      go run /gofree5gc/src/udr/udr.go -udrcfg /config/udrcfg.conf
-      "
+    command: ./udr -udrcfg /config/udrcfg.conf
     expose:
       - "29504"
     volumes:
-      - "./gofree5gc:/gofree5gc"
       - "./config:/config"
     environment:
       DB_URI: mongodb://db/free5gc

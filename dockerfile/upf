@@ -1,0 +1,28 @@
+From golang:1.12.9-stretch AS builder
+
+MAINTAINER Chia-An Lee <calee@cs.nctu.edu.tw>
+
+ENV GO111MODULE=off
+
+RUN apt-get update
+RUN apt-get -y install gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev netcat tcpdump
+RUN apt-get clean
+
+# Get Free5GC
+RUN cd $GOPATH/src \
+    && git clone https://github.com/free5gc/free5gc.git \
+    && cd free5gc \
+    && git submodule update --init
+
+# Build UPF
+RUN go get -u -v "github.com/sirupsen/logrus"
+RUN cd $GOPATH/src/free5gc/src/upf \
+    && mkdir -p build \
+    && cd build \
+    && cmake .. \
+    && make -j `nproc`
+
+WORKDIR $GOPATH/src/free5gc/src/upf/build/bin
+
+CMD $GOPATH/src/free5gc/src/upf/build/bin/free5gc-upfd
+
