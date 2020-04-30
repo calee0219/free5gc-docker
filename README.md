@@ -1,107 +1,24 @@
-# free5GC IPTV
+# free5GC Docker
 
-This is an simple IPTV Server that you can self host on Linux / Windows base on [FFmpeg](https://www.ffmpeg.org/) and [Go](https://golang.org/).
+This repository is a docker compose version of [free5GC](https://github.com/free5gc/free5gc) for stage 3. It's inspire by [free5gc-docker-compose](https://github.com/calee0219/free5gc-docker-compose) and also reference to [docker-free5GC](https://github.com/abousselmi/docker-free5gc).
 
-This project is maintained by [free5GC](https://free5gc.org) for validation of IPTV applications in 5G core network.
+You can change your own config in [config](./config) folder and [docker-compose.yaml](docker-compose.yaml)
 
-## Installation
+## NF
 
-### Install Dependencies
+For my default setting.
 
-- FFmpeg
-
-    ```shell
-    sudo apt install -y ffmpeg
-    ```
-
-- node.js
-  
-    ```shell
-    sudo apt-get install nodejs
-    ```
-
-- yarn
-
-    ```shell
-    sudo apt install -y curl
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    sudo apt update && sudo apt install yarn
-    ```
-
-- npm
-
-    ```shell
-    sudo apt-get install python-software-properties
-    sudo add-apt-repository ppa:gias-kay-lee/npm
-    sudo apt-get update
-    sudo apt-get install npm
-    ```
-
-- golang
-
-    ```shell
-    wget https://dl.google.com/go/go1.12.9.linux-amd64.tar.gz
-    sudo tar -C /usr/local -zxvf go1.12.9.linux-amd64.tar.gz
-    mkdir -p ~/go/{bin,pkg,src}
-    echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-    echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
-    echo 'export PATH=$PATH:$GOPATH/bin:$GOROOT/bin' >> ~/.bashrc
-    echo 'export GO111MODULE=off' >> ~/.bashrc
-    source ~/.bashrc
-    ```
-
-### Build Project
-
-- Install go package
-
-    ```shell
-    go get -u github.com/gin-contrib/static
-    go get -u github.com/gin-gonic/gin
-    go get -u github.com/urfave/cli
-    go get -u gopkg.in/yaml.v2
-    ```
-
-- Build Web Client
-
-    ```shell
-    cd web-client
-    yarn install
-    yarn build
-    cd ..
-    vim iptvcfg.conf # Configure iptv details
-    go run iptv.go
-    ```
-
-## How to watch IPTV
-
-The IPTV channel playlist's location depends on what you configure in `iptvcfg.conf`'s IPTVServer -> ServerAddr
-
-And the playlist's location will be: `IPv4:Port/iptv/index.m3u`
-
-1. Generally
-    Using Web to check IPTV channel is an general way to do it. You can use our web to view IPTV channel.
-
-    Open your web browser, goto the ip:port you have configured in `iptvcfg.conf`'s ServerAddr.
-
-2. On PC
-    You can use:
-    - [VLC](https://www.videolan.org/vlc/index.zh-TW.html)
-    - [Kodi](https://kodi.tv/)
-    - [IINA](https://iina.io/) (only on OSX)
-
-3. On Android
-    - [NET IP TV](https://play.google.com/store/apps/details?id=com.dnamedya.netiptv)
-    - [Kodi](https://play.google.com/store/apps/details?id=org.xbmc.kodi)
-
-4. On iOS
-     - [GSE SMART IPTV](https://apps.apple.com/us/app/gse-smart-iptv/id1028734023)
-     - [Movie Stream: Cast & Streaming](https://apps.apple.com/us/app/movie-stream-ip-tv-films/id1450912244)
-  
-## Contact Information
-
-You can contact [free5gc.org@gmail.com](mailto:free5gc.org@gmail.com).
-
-## License
-
-We are using [Apache 2.0](./LICENSE.txt) for the project.
+| NF | IP | Exposed Ports | Dependencies | Dependencies URI |
+|:-:|:-:|:-:|:-:|:-:|
+| amf | 10.200.200.3 | 29518 | nrf | nrfUri: https://nrf:29510 |
+| ausf | 10.200.200.4 | 29509 | nrf | nrfUri: https://nrf:29510 |
+| n3iwf |
+| nrf | 10.200.200.2 | 29510 | db | MongoDBUrl: mongodb://db:27017 |
+| nssf | 10.200.200.5 | 29531 | nrf | nrfUri: https://nrf:29510gg/,<br/>nrfId: https://nrf:29510/nnrf-nfm/v1/nf-instances |
+| pcf | 10.200.200.6 | 29507 | nrf | nrfUri: https://nrf:29510 |
+| smf | 10.200.200.7 | 29502 | nrf, upf | nrfUri: https://nrf:29510,<br/>node_id: upf1, node_id: upf2, node_id: upf3 |
+| udm | 10.200.200.8 | 29503 | nrf | nrfUri: https://nrf:29510 |
+| udr | 10.200.200.9 | 29504 | nrf, db | nrfUri: https://nrf:29510,<br/>url: mongodb://db:27017 |
+| upf1 | 10.200.200.101 | N/A | pfcp, gtpu, apn | pfcp: upf1, gtpu: upf1, apn: internet |
+| upf2 | 10.200.200.103 | N/A | pfcp, gtpu, apn | pfcp: upf2, gtpu: upf2, apn: internet |
+| upfb (ulcl) | 10.200.200.102 | N/A | pfcp, gtpu, apn | pfcp: upfb, gtpu: upfb, apn: intranet |
