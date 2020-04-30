@@ -2,10 +2,10 @@ version: '2'
 
 services:
   free5gc-upf-1:
+    container_name: upf1
     build:
       context: .
       dockerfile: dockerfile/upf
-      #container_name: upf
     command: ./free5gc-upfd -f /config/upfcfg1.yaml
     privileged: true
     volumes:
@@ -19,10 +19,10 @@ services:
         ipv4_address: 10.200.200.101
 
   free5gc-upf-2:
+    container_name: upf2
     build:
       context: .
       dockerfile: dockerfile/upf
-      #container_name: upf
     command: ./free5gc-upfd -f /config/upfcfg2.yaml
     privileged: true
     volumes:
@@ -36,10 +36,10 @@ services:
         ipv4_address: 10.200.200.103
 
   free5gc-upf-b:
+    container_name: upfb
     build:
       context: .
       dockerfile: dockerfile/upf
-      #container_name: upf
     command: ./free5gc-upfd -f /config/upfcfgb.yaml
     privileged: true
     volumes:
@@ -53,8 +53,8 @@ services:
         ipv4_address: 10.200.200.102
 
   db:
-    image: mongo
     container_name: mongodb
+    image: mongo
     command: mongod --port 27017
     expose:
       - "27017"
@@ -63,10 +63,10 @@ services:
         ipv4_address: 10.200.200.1
 
   free5gc-nrf:
+    container_name: nrf
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nrf
     command: ./nrf -nrfcfg /config/nrfcfg.conf
     expose:
       - "29510"
@@ -81,10 +81,10 @@ services:
       - db
 
   free5gc-amf:
+    container_name: amf
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: amf
     command: ./amf -amfcfg /config/amfcfg.conf
     expose:
       - "29518"
@@ -97,10 +97,10 @@ services:
       - free5gc-nrf
 
   free5gc-ausf:
+    container_name: ausf
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ausf
     command: ./ausf -ausfcfg /config/ausfcfg.conf
     expose:
       - "29509"
@@ -113,10 +113,10 @@ services:
       - free5gc-nrf
 
   free5gc-nssf:
+    container_name: nssf
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nssf
     command: ./nssf -nssfcfg /config/nssfcfg.conf
     expose:
       - "29531"
@@ -129,10 +129,10 @@ services:
       - free5gc-nrf
 
   free5gc-pcf:
+    container_name: pcf
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: pcf
     command: ./pcf -pcfcfg /config/pcfcfg.conf
     expose:
       - "29507"
@@ -145,10 +145,10 @@ services:
       - free5gc-nrf
 
   free5gc-smf:
+    container_name: smf
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: smf
     command: ./smf -smfcfg /config/smfcfg.conf -uerouting /config/uerouting.yaml
     expose:
       - "29502"
@@ -164,10 +164,10 @@ services:
       - free5gc-upf-b
 
   free5gc-udm:
+    container_name: udm
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: udm
     command: ./udm -udmcfg /config/udmcfg.conf
     expose:
       - "29503"
@@ -177,13 +177,14 @@ services:
       privnet:
         ipv4_address: 10.200.200.8
     depends_on:
+      - db
       - free5gc-nrf
 
   free5gc-udr:
+    container_name: udr
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: udr
     command: ./udr -udrcfg /config/udrcfg.conf
     expose:
       - "29504"
