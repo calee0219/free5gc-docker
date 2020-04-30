@@ -110,3 +110,4 @@ For my default setting.
 
 ## Reference
 - https://github.com/open5gs/nextepc/tree/master/docker
+- https://github.com/abousselmi/docker-free5gc
