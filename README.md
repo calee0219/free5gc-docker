@@ -16,6 +16,79 @@ make
 sudo make install
 ```
 
+## How to use it
+### Install docker.
+
+#### Ubuntu
+Reference: https://docs.docker.com/install/linux/docker-ce/ubuntu/
+```bash
+$ sudo apt-get update
+$ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+$ sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+
+$ sudo apt-get update
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io
+```
+
+#### CentOS
+Reference: https://docs.docker.com/install/linux/docker-ce/centos/
+```bash
+$ sudo yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+
+$ sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+
+$ sudo yum install docker-ce docker-ce-cli containerd.io
+
+$ sudo systemctl start docker
+$ sudo systemctl enable docker
+```
+
+### Install docker-compose
+Reference: https://docs.docker.com/v17.09/compose/install/
+```bash
+$ sudo curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose
+```
+
+### Run Up
+Because we need to create tunnel interface, we need to use privileged container with root permission.
+```bash
+$ git clone https://github.com/calee0219/free5gc-docker.git
+$ cd free5gc-docker
+$ docker-compose build
+$ sudo docker-compose up # Recommand use with tmux to run in frontground
+$ sudo docker-compose up -d # Run in backbround if need
+```
+
+## Troubleshooting
+Sometimes, you need to drop data from DB(See #Troubleshooting from https://www.free5gc.org/installation).
+```bash
+$ docker exec -it mongodb mongo
+> use free5gc
+> db.subscribers.drop()
+> exit # (Or Ctrl-D)
+```
+
+Another way to drop DB data is just remove db data. Outside your container, run:
+```bash
+$ rm -rf ./mongodb
+```
+
 ## NF
 
 For my default setting.
@@ -34,3 +107,6 @@ For my default setting.
 | upf1 | 10.200.200.101 | N/A | pfcp, gtpu, apn | pfcp: upf1, gtpu: upf1, apn: internet |
 | upf2 | 10.200.200.103 | N/A | pfcp, gtpu, apn | pfcp: upf2, gtpu: upf2, apn: internet |
 | upfb (ulcl) | 10.200.200.102 | N/A | pfcp, gtpu, apn | pfcp: upfb, gtpu: upfb, apn: intranet |
+
+## Reference
+- https://github.com/open5gs/nextepc/tree/master/docker
