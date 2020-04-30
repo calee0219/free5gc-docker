@@ -4,6 +4,18 @@ This repository is a docker compose version of [free5GC](https://github.com/free
 
 You can change your own config in [config](./config) folder and [docker-compose.yaml](docker-compose.yaml)
 
+## Pre-request
+
+Due to the UPF issue, the host must using kernel `5.0.0-23-generic`. And it should contain `gtp5g` kernel module.
+
+On you host OS:
+```
+git clone https://github.com/PrinzOwO/gtp5g.git
+cd gtp5g
+make
+sudo make install
+```
+
 ## NF
 
 For my default setting.
