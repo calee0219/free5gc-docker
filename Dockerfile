@@ -5,7 +5,7 @@ MAINTAINER Chia-An Lee <calee@cs.nctu.edu.tw>
 ENV GO111MODULE=off
 
 RUN apt-get update
-RUN apt-get -y install gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev netcat tcpdump
+RUN apt-get -y install gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev
 RUN apt-get clean
 
 # Get Free5GC
@@ -29,6 +29,10 @@ RUN cd $GOPATH/src/free5gc/src/upf \
 
 FROM ubuntu:18.04
 
+RUN apt-get update
+RUN apt-get -y install netcat tcpdump iproute2
+RUN apt-get clean
+
 WORKDIR /root/free5gc
 # Copy AMF, AUSF, N3IWF, NRF, NSSF, PCF, SMF, UDM, UDR
 COPY --from=builder /go/src/free5gc/bin/* ./
@@ -40,6 +44,4 @@ COPY --from=builder /go/src/free5gc/support/TLS/* ../support/TLS/
 # Copy log key
 RUN mkdir -p ../config
 COPY --from=builder /go/src/free5gc/config/free5GC.conf ../config
-
-CMD /gofree5gc/src/upf/build/bin/upf
 

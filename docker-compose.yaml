@@ -197,8 +197,35 @@ services:
         ipv4_address: 10.200.200.9
     depends_on:
       - db
-    depends_on:
       - free5gc-nrf
+
+  free5gc-n3iwf:
+    container_name: n3iwf
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: |
+      /bin/bash -c "
+        ip l add name ipsec0 type vti local 10.200.200.10 remote 0.0.0.0 key 5
+        ip a add 10.0.0.1/24 dev ipsec0
+        ip l set dev ipsec0 up
+        ./n3iwf -n3iwfcfg /config/n3iwfcfg.conf
+        sleep 100000
+      "
+    privileged: true
+    #cap_add:
+    #  - NET_ADMIN
+    #devices:
+    #  - "/dev/net/tun:/dev/net/tun"
+    expose:
+      - "29504"
+    volumes:
+      - "./config:/config"
+    networks:
+      privnet:
+        ipv4_address: 10.200.200.10
+    depends_on:
+      - free5gc-amf
 
 networks:
   privnet:
