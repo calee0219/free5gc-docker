@@ -30,7 +30,7 @@ RUN cd $GOPATH/src/free5gc/src/upf \
 FROM ubuntu:18.04
 
 RUN apt-get update
-RUN apt-get -y install netcat tcpdump iproute2
+RUN apt-get -y install netcat tcpdump iproute2 libtool
 RUN apt-get clean
 
 WORKDIR /root/free5gc
